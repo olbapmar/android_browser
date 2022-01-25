@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
 
 class MainActivity : AppCompatActivity(), TabsManager.URLChangeListener {
@@ -16,7 +17,11 @@ class MainActivity : AppCompatActivity(), TabsManager.URLChangeListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        tabsManager = TabsManager(findViewById<WebView>(R.id.webview), this)
+        val webView = WebView(this)
+
+        findViewById<FrameLayout>(R.id.webViewHolder).addView(webView)
+
+        tabsManager = TabsManager(webView, this)
 
 
         findViewById<ImageView>(R.id.backButton).setOnClickListener {
@@ -29,6 +34,14 @@ class MainActivity : AppCompatActivity(), TabsManager.URLChangeListener {
 
         findViewById<ImageView>(R.id.reloadButton).setOnClickListener {
             tabsManager.reload()
+        }
+
+        findViewById<ImageView>(R.id.tabsButton).setOnClickListener {
+            val newWebView = WebView(this)
+            findViewById<FrameLayout>(R.id.webViewHolder).removeAllViews()
+            findViewById<FrameLayout>(R.id.webViewHolder).addView(newWebView)
+            tabsManager.addTab(newWebView, true)
+            tabsManager.loadWebPage(getString(R.string.uri_default))
         }
 
         findViewById<EditText>(R.id.uriText).setOnEditorActionListener { textView, id, keyEent ->
