@@ -22,4 +22,4 @@ This section contains improvements I would do in the future:
 - Allow users to customize the default URL via config menu
 - URLs suggestions
 - Default search engine for whenever the users introduces a string that is not a url
-- Tests  (I would have loved to make tests, but I hadn't time to learn about them :( )
+- Tests
