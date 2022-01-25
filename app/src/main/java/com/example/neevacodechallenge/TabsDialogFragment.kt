@@ -11,6 +11,8 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.WindowManager
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class TabsDialogFragment(tabsManager: TabsManager): DialogFragment() {
 
@@ -25,6 +27,10 @@ class TabsDialogFragment(tabsManager: TabsManager): DialogFragment() {
             tabsManager.addTab(true)
             dismiss()
         }
+
+        val recyclerView = view.findViewById<RecyclerView>(R.id.tabsRecyclerView)
+        recyclerView.layoutManager = GridLayoutManager(activity, 2)
+        recyclerView.adapter = TabAdapter(tabsManager, this)
 
         return view
     }

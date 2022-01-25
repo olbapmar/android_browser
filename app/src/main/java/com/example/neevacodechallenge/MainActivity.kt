@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity(), TabsManager.ClientActivity {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        tabsManager = TabsManager(this)
+        tabsManager = TabsManager(this, getString(R.string.uri_default))
         tabsManager.addTab(true)
 
 
@@ -63,6 +63,5 @@ class MainActivity : AppCompatActivity(), TabsManager.ClientActivity {
     override fun showWebView(webView: WebView) {
         findViewById<FrameLayout>(R.id.webViewHolder).removeAllViews()
         findViewById<FrameLayout>(R.id.webViewHolder).addView(webView)
-        tabsManager.loadWebPage(getString(R.string.uri_default))
     }
 }

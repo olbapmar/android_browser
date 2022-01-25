@@ -1,19 +1,17 @@
 package com.example.neevacodechallenge
 
+import android.content.res.Resources
 import android.net.Uri
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import java.text.FieldPosition
 
-class TabsManager {
+class TabsManager(listener: ClientActivity, defaultUrl: String) {
 
     interface ClientActivity {
         fun onURLChanged(newURL: String)
         fun createWebView() : WebView
         fun showWebView(webView: WebView)
-    }
-
-    constructor(listener: ClientActivity) {
-        clientActivity = listener
     }
 
     fun addTab(setAsActive: Boolean) {
@@ -34,6 +32,29 @@ class TabsManager {
             activeWebView = webView
             clientActivity.showWebView(webView)
             clientActivity.onURLChanged(activeWebView.url ?: "")
+        }
+        loadWebPage(defaultUrl)
+    }
+
+    fun closeTab(position: Int) {
+        if (position >= 0 && position < webViews.size) {
+            if (webViews[position] == activeWebView) {
+                if (webViews.size > 1) {
+                    activeWebView = webViews[(position + 1) % webViews.size]
+                } else {
+                    addTab(true)
+                }
+            }
+
+            webViews.remove(webViews[position])
+            clientActivity.showWebView(activeWebView)
+        }
+    }
+
+    fun selectTab(position: Int) {
+        if (position >= 0 && position < webViews.size) {
+            activeWebView = webViews[position]
+            clientActivity.showWebView(activeWebView)
         }
     }
 
@@ -79,7 +100,8 @@ class TabsManager {
         }
     }
 
-    private val clientActivity: ClientActivity
+    private val clientActivity: ClientActivity = listener
     val webViews: ArrayList<WebView> = ArrayList()
     lateinit var activeWebView : WebView
+    val defaultUrl : String = defaultUrl
 }
