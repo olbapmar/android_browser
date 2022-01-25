@@ -1,6 +1,7 @@
 package com.example.neevacodechallenge
 
 import android.net.Uri
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.view.drawToBitmap
@@ -11,6 +12,7 @@ class TabsManager(listener: ClientActivity, defaultUrl: String) {
         fun onURLChanged(newURL: String)
         fun createWebView() : WebView
         fun showWebView(webView: WebView)
+        fun onProgressChanged(progress: Int)
     }
 
     fun addTab(setAsActive: Boolean) {
@@ -32,6 +34,14 @@ class TabsManager(listener: ClientActivity, defaultUrl: String) {
 
                 if (view?.isLaidOut?:false) {
                     tab.bitmap = view?.drawToBitmap()
+                }
+            }
+        }
+
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                if (view != null && view == activeTab.webView) {
+                    clientActivity.onProgressChanged(newProgress)
                 }
             }
         }
@@ -94,17 +104,18 @@ class TabsManager(listener: ClientActivity, defaultUrl: String) {
     }
 
     fun loadWebPage(text: String) {
+        if(text.isNotEmpty()) {
+            var urlText = text
+            activeTab.webView.settings.javaScriptEnabled = true
 
-        var urlText = text
-        activeTab.webView.settings.javaScriptEnabled = true
-
-        try {
-            if (!text.startsWith("http://") && !text.startsWith("https://")) {
-                urlText = buildUri(urlText).toString()
+            try {
+                if (!text.startsWith("http://") && !text.startsWith("https://")) {
+                    urlText = buildUri(urlText).toString()
+                }
+                activeTab.webView.loadUrl(urlText)
+            } catch (e: UnsupportedOperationException) {
+                e.printStackTrace()
             }
-            activeTab.webView.loadUrl(urlText)
-        } catch (e: UnsupportedOperationException) {
-            e.printStackTrace()
         }
     }
 

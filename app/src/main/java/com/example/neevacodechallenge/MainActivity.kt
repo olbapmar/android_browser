@@ -1,16 +1,18 @@
 package com.example.neevacodechallenge
 
 import android.content.Context
-import android.net.Uri
+import android.graphics.ColorFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.ProgressBar
 
 class MainActivity : AppCompatActivity(), TabsManager.ClientActivity {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +66,17 @@ class MainActivity : AppCompatActivity(), TabsManager.ClientActivity {
         findViewById<FrameLayout>(R.id.webViewHolder).removeAllViews()
         findViewById<FrameLayout>(R.id.webViewHolder).addView(webView)
         findViewById<EditText>(R.id.uriText).setText(webView.url ?: "")
+    }
+
+    override fun onProgressChanged(progress: Int) {
+        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+
+        if(progress == 100) {
+            progressBar.visibility = GONE
+        } else {
+            progressBar.progress = progress
+            progressBar.visibility = VISIBLE
+        }
     }
 
     override fun onBackPressed() {
