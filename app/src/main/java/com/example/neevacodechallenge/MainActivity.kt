@@ -11,69 +11,41 @@ import android.webkit.WebViewClient
 import android.widget.EditText
 import android.widget.ImageView
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TabsManager.URLChangeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        tabsManager = TabsManager(findViewById<WebView>(R.id.webview), this)
+
+
         findViewById<ImageView>(R.id.backButton).setOnClickListener {
-            if (findViewById<WebView>(R.id.webview).canGoBack()) {
-                findViewById<WebView>(R.id.webview).goBack()
-            }
+            tabsManager.goBack()
         }
 
         findViewById<ImageView>(R.id.forwardButton).setOnClickListener {
-            if (findViewById<WebView>(R.id.webview).canGoForward()) {
-                findViewById<WebView>(R.id.webview).goForward()
-            }
+            tabsManager.goForward()
         }
 
         findViewById<ImageView>(R.id.reloadButton).setOnClickListener {
-            findViewById<WebView>(R.id.webview).reload()
+            tabsManager.reload()
         }
 
         findViewById<EditText>(R.id.uriText).setOnEditorActionListener { textView, id, keyEent ->
             if (id == EditorInfo.IME_ACTION_DONE) {
-                loadWebPage()
+                tabsManager.loadWebPage(findViewById<EditText>(R.id.uriText).text.toString())
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
                 true
             } else false
         }
 
-        findViewById<WebView>(R.id.webview).webViewClient = object : WebViewClient() {
-            override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
-                findViewById<EditText>(R.id.uriText).setText(url)
-                super.doUpdateVisitedHistory(view, url, isReload)
-            }
-        }
-
-        loadWebPage()
+        tabsManager.loadWebPage(findViewById<EditText>(R.id.uriText).text.toString())
     }
 
-    @Throws(UnsupportedOperationException::class)
-    fun buildUri(authority: String) : Uri {
-        val builder = Uri.Builder()
-        builder.scheme("https").authority(authority)
+    lateinit var tabsManager: TabsManager
 
-        return builder.build()
-    }
-
-    fun loadWebPage() {
-        var webView = findViewById<WebView>(R.id.webview)
-
-        webView.loadUrl("")
-
-        webView.settings.javaScriptEnabled = true
-
-        try {
-            var text = findViewById<EditText>(R.id.uriText).text.toString()
-            if (!text.startsWith("http://") && !text.startsWith("https://")) {
-                text = buildUri(text).toString()
-            }
-            webView.loadUrl(text)
-        } catch (e: UnsupportedOperationException) {
-            e.printStackTrace()
-        }
+    override fun onURLChanged(newURL: String) {
+        findViewById<EditText>(R.id.uriText).setText(newURL)
     }
 }
