@@ -13,18 +13,18 @@ class TabsManager {
     }
 
     constructor(listener: ClientActivity) {
-        urlChangeListener = listener
+        clientActivity = listener
     }
 
     fun addTab(setAsActive: Boolean) {
-        val webView = urlChangeListener.createWebView()
+        val webView = clientActivity.createWebView()
 
         webViews.add(webView)
 
         webView.webViewClient = object : WebViewClient() {
             override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
                 if (url != null && view != null && view == activeWebView) {
-                    urlChangeListener.onURLChanged(url)
+                    clientActivity.onURLChanged(url)
                 }
                 super.doUpdateVisitedHistory(view, url, isReload)
             }
@@ -32,8 +32,8 @@ class TabsManager {
 
         if (setAsActive) {
             activeWebView = webView
-            urlChangeListener.showWebView(webView)
-            urlChangeListener.onURLChanged(activeWebView.url ?: "")
+            clientActivity.showWebView(webView)
+            clientActivity.onURLChanged(activeWebView.url ?: "")
         }
     }
 
@@ -79,7 +79,7 @@ class TabsManager {
         }
     }
 
-    private val urlChangeListener: ClientActivity
+    private val clientActivity: ClientActivity
     val webViews: ArrayList<WebView> = ArrayList()
     lateinit var activeWebView : WebView
 }
