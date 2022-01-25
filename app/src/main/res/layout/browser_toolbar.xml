@@ -21,10 +21,19 @@
             android:layout_margin="5dp"
             android:padding="5dp" />
 
+        <ImageView
+            android:id="@+id/tabsButton"
+            android:layout_weight="0.1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/tabs"
+            android:layout_margin="5dp"
+            android:padding="5dp" />
+
         <EditText
             android:id="@+id/uriText"
             android:text="@string/uri_default"
-            android:layout_weight="0.6"
+            android:layout_weight="0.5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:inputType="textUri"
