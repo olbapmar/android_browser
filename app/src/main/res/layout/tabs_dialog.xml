@@ -13,11 +13,12 @@
         <Space
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="0.92" />
 
         <ImageView
             android:id="@+id/addTab"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="0.08"
             android:layout_height="wrap_content"
             android:src="@drawable/add" />
 

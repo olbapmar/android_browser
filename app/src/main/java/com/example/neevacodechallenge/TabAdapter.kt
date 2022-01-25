@@ -1,5 +1,6 @@
 package com.example.neevacodechallenge
 
+import android.graphics.Typeface.BOLD
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,6 +45,10 @@ class TabAdapter(tabManager: TabsManager, dialog: TabsDialogFragment): RecyclerV
         holder.textView.setOnClickListener {
             tabsManager.selectTab(position)
             dialogFragment.dismiss()
+        }
+
+        if(tabsManager.webViews[position] == tabsManager.activeWebView) {
+            holder.textView.setTypeface(null, BOLD)
         }
     }
 

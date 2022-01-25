@@ -64,4 +64,8 @@ class MainActivity : AppCompatActivity(), TabsManager.ClientActivity {
         findViewById<FrameLayout>(R.id.webViewHolder).removeAllViews()
         findViewById<FrameLayout>(R.id.webViewHolder).addView(webView)
     }
+
+    override fun onBackPressed() {
+        if (tabsManager.numberOfTabs() > 1) tabsManager.goBack()
+    }
 }
