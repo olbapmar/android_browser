@@ -14,11 +14,13 @@ class TabAdapter(tabManager: TabsManager, dialog: TabsDialogFragment): RecyclerV
         val textView: TextView
         val imageView: ImageView
         val closeButton: ImageView
+        val thumbnailView : ImageView
 
         init {
             textView = view.findViewById(R.id.tabName)
             imageView = view.findViewById(R.id.favIcon)
             closeButton = view.findViewById(R.id.closeButton)
+            thumbnailView = view.findViewById(R.id.tabThumbnail)
         }
 
     }
@@ -31,8 +33,12 @@ class TabAdapter(tabManager: TabsManager, dialog: TabsDialogFragment): RecyclerV
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.imageView.setImageBitmap(tabsManager.webViews[position].favicon)
-        holder.textView.text = tabsManager.webViews[position].title
+        tabsManager.updateThumbnail()
+
+        holder.imageView.setImageBitmap(tabsManager.tabs[position].webView.favicon)
+        holder.textView.text = tabsManager.tabs[position].webView.title
+        holder.thumbnailView.setImageBitmap(tabsManager.tabs[position].bitmap)
+
         holder.closeButton.setOnClickListener {
             tabsManager.closeTab(position)
             notifyDataSetChanged()
@@ -47,7 +53,12 @@ class TabAdapter(tabManager: TabsManager, dialog: TabsDialogFragment): RecyclerV
             dialogFragment.dismiss()
         }
 
-        if(tabsManager.webViews[position] == tabsManager.activeWebView) {
+        holder.thumbnailView.setOnClickListener {
+            tabsManager.selectTab(position)
+            dialogFragment.dismiss()
+        }
+
+        if(tabsManager.tabs[position] == tabsManager.activeTab) {
             holder.textView.setTypeface(null, BOLD)
         }
     }

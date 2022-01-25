@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity(), TabsManager.ClientActivity {
     override fun showWebView(webView: WebView) {
         findViewById<FrameLayout>(R.id.webViewHolder).removeAllViews()
         findViewById<FrameLayout>(R.id.webViewHolder).addView(webView)
+        findViewById<EditText>(R.id.uriText).setText(webView.url ?: "")
     }
 
     override fun onBackPressed() {

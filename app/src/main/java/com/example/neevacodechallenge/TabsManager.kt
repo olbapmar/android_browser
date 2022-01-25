@@ -1,10 +1,9 @@
 package com.example.neevacodechallenge
 
-import android.content.res.Resources
 import android.net.Uri
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import java.text.FieldPosition
+import androidx.core.view.drawToBitmap
 
 class TabsManager(listener: ClientActivity, defaultUrl: String) {
 
@@ -17,65 +16,74 @@ class TabsManager(listener: ClientActivity, defaultUrl: String) {
     fun addTab(setAsActive: Boolean) {
         val webView = clientActivity.createWebView()
 
-        webViews.add(webView)
+        val tab = Tab(webView, null)
+        tabs.add(tab)
 
         webView.webViewClient = object : WebViewClient() {
             override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
-                if (url != null && view != null && view == activeWebView) {
+                if (url != null && view != null && view == activeTab.webView) {
                     clientActivity.onURLChanged(url)
                 }
                 super.doUpdateVisitedHistory(view, url, isReload)
             }
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+
+                if (view?.isLaidOut?:false) {
+                    tab.bitmap = view?.drawToBitmap()
+                }
+            }
         }
 
         if (setAsActive) {
-            activeWebView = webView
+            activeTab = tab
             clientActivity.showWebView(webView)
-            clientActivity.onURLChanged(activeWebView.url ?: "")
+            clientActivity.onURLChanged(activeTab.webView.url ?: "")
         }
         loadWebPage(defaultUrl)
     }
 
     fun closeTab(position: Int) {
-        if (position >= 0 && position < webViews.size) {
-            if (webViews[position] == activeWebView) {
-                if (webViews.size > 1) {
-                    activeWebView = webViews[(position + 1) % webViews.size]
+        if (position >= 0 && position < tabs.size) {
+            if (tabs[position] == activeTab) {
+                if (tabs.size > 1) {
+                    activeTab = tabs[(position + 1) % tabs.size]
                 } else {
                     addTab(true)
                 }
             }
 
-            webViews.remove(webViews[position])
-            clientActivity.showWebView(activeWebView)
+            tabs.remove(tabs[position])
+            clientActivity.showWebView(activeTab.webView)
         }
     }
 
     fun selectTab(position: Int) {
-        if (position >= 0 && position < webViews.size) {
-            activeWebView = webViews[position]
-            clientActivity.showWebView(activeWebView)
+        if (position >= 0 && position < tabs.size) {
+            activeTab = tabs[position]
+            clientActivity.showWebView(activeTab.webView)
         }
     }
 
     fun goBack() {
-        if (activeWebView.canGoBack()) {
-            activeWebView.goBack()
+        if (activeTab.webView.canGoBack()) {
+            activeTab.webView.goBack()
         }
     }
 
     fun goForward() {
-        if (activeWebView.canGoForward()) {
-            activeWebView.goForward()
+        if (activeTab.webView.canGoForward()) {
+            activeTab.webView.goForward()
         }
     }
 
     fun reload() {
-        activeWebView.reload()
+        activeTab.webView.reload()
     }
 
     fun numberOfTabs(): Int{
-        return webViews.size
+        return tabs.size
     }
 
     @Throws(UnsupportedOperationException::class) private fun buildUri(authority: String) : Uri {
@@ -88,20 +96,26 @@ class TabsManager(listener: ClientActivity, defaultUrl: String) {
     fun loadWebPage(text: String) {
 
         var urlText = text
-        activeWebView.settings.javaScriptEnabled = true
+        activeTab.webView.settings.javaScriptEnabled = true
 
         try {
             if (!text.startsWith("http://") && !text.startsWith("https://")) {
                 urlText = buildUri(urlText).toString()
             }
-            activeWebView.loadUrl(urlText)
+            activeTab.webView.loadUrl(urlText)
         } catch (e: UnsupportedOperationException) {
             e.printStackTrace()
         }
     }
 
+    fun updateThumbnail() {
+        if (activeTab.webView?.isLaidOut?:false) {
+            activeTab.bitmap = activeTab?.webView.drawToBitmap()
+        }
+    }
+
     private val clientActivity: ClientActivity = listener
-    val webViews: ArrayList<WebView> = ArrayList()
-    lateinit var activeWebView : WebView
+    val tabs: ArrayList<Tab> = ArrayList()
+    lateinit var activeTab : Tab
     val defaultUrl : String = defaultUrl
 }
