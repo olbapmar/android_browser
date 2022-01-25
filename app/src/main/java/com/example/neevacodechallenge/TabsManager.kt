@@ -6,19 +6,19 @@ import android.webkit.WebViewClient
 
 class TabsManager {
 
-    interface URLChangeListener {
+    interface ClientActivity {
         fun onURLChanged(newURL: String)
+        fun createWebView() : WebView
+        fun showWebView(webView: WebView)
     }
 
-    constructor(webView: WebView, listener: URLChangeListener) {
+    constructor(listener: ClientActivity) {
         urlChangeListener = listener
-        webViews = ArrayList()
-        activeWebView = webView
-
-        addTab(webView, true)
     }
 
-    fun addTab(webView: WebView, setAsActive: Boolean) {
+    fun addTab(setAsActive: Boolean) {
+        val webView = urlChangeListener.createWebView()
+
         webViews.add(webView)
 
         webView.webViewClient = object : WebViewClient() {
@@ -32,6 +32,7 @@ class TabsManager {
 
         if (setAsActive) {
             activeWebView = webView
+            urlChangeListener.showWebView(webView)
             urlChangeListener.onURLChanged(activeWebView.url ?: "")
         }
     }
@@ -78,7 +79,7 @@ class TabsManager {
         }
     }
 
-    private val urlChangeListener: URLChangeListener
-    val webViews: ArrayList<WebView>
-    var activeWebView : WebView
+    private val urlChangeListener: ClientActivity
+    val webViews: ArrayList<WebView> = ArrayList()
+    lateinit var activeWebView : WebView
 }

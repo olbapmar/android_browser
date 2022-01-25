@@ -12,16 +12,13 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 
-class MainActivity : AppCompatActivity(), TabsManager.URLChangeListener {
+class MainActivity : AppCompatActivity(), TabsManager.ClientActivity {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val webView = WebView(this)
-
-        findViewById<FrameLayout>(R.id.webViewHolder).addView(webView)
-
-        tabsManager = TabsManager(webView, this)
+        tabsManager = TabsManager(this)
+        tabsManager.addTab(true)
 
 
         findViewById<ImageView>(R.id.backButton).setOnClickListener {
@@ -37,11 +34,8 @@ class MainActivity : AppCompatActivity(), TabsManager.URLChangeListener {
         }
 
         findViewById<ImageView>(R.id.tabsButton).setOnClickListener {
-            val newWebView = WebView(this)
-            findViewById<FrameLayout>(R.id.webViewHolder).removeAllViews()
-            findViewById<FrameLayout>(R.id.webViewHolder).addView(newWebView)
-            tabsManager.addTab(newWebView, true)
-            tabsManager.loadWebPage(getString(R.string.uri_default))
+            var dialog = TabsDialogFragment(tabsManager)
+            dialog.show(supportFragmentManager, "TabDialog")
         }
 
         findViewById<EditText>(R.id.uriText).setOnEditorActionListener { textView, id, keyEent ->
@@ -60,5 +54,15 @@ class MainActivity : AppCompatActivity(), TabsManager.URLChangeListener {
 
     override fun onURLChanged(newURL: String) {
         findViewById<EditText>(R.id.uriText).setText(newURL)
+    }
+
+    override fun createWebView(): WebView {
+        return WebView(this)
+    }
+
+    override fun showWebView(webView: WebView) {
+        findViewById<FrameLayout>(R.id.webViewHolder).removeAllViews()
+        findViewById<FrameLayout>(R.id.webViewHolder).addView(webView)
+        tabsManager.loadWebPage(getString(R.string.uri_default))
     }
 }
